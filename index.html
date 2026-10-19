@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0f9d6e">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Dhanam">
+<title>Dhanam · ധനം</title>
+<style>
+:root{
+  --bg:#eef4f1; --card:#ffffff; --card2:#f6faf8; --border:rgba(15,60,45,.10);
+  --text:#12211c; --muted:#6b8079; --green:#0f9d6e; --green-d:#0a7a55;
+  --gold:#e0a416; --red:#e5484d; --blue:#3b82f6; --purple:#8b5cf6;
+  --shadow:0 4px 18px rgba(12,50,38,.07);
+}
+body.dark{
+  --bg:#0d1512; --card:#16211d; --card2:#1c2925; --border:rgba(255,255,255,.08);
+  --text:#e7f2ed; --muted:#8fa8a0; --shadow:0 4px 18px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans Malayalam',sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.5;padding-bottom:96px;overflow-x:hidden}
+.wrap{max-width:600px;margin:0 auto;padding:0 14px}
+/* header */
+.topbar{position:sticky;top:0;z-index:50;background:var(--bg);padding:14px 0 8px}
+.toprow{display:flex;align-items:center;gap:10px}
+.brand{font-size:1.35em;font-weight:800;letter-spacing:.5px}
+.brand .ml{font-size:.62em;color:var(--muted);font-weight:600;display:block;letter-spacing:0}
+.spacer{flex:1}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:var(--card);
+  display:flex;align-items:center;justify-content:center;font-size:1.15em;cursor:pointer}
+.greet{margin:10px 0 2px;font-size:1.12em;font-weight:700}
+.gdate{color:var(--muted);font-size:.78em;margin-bottom:12px}
+/* mode toggle */
+.modes{display:flex;background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:4px;margin:8px 0 12px}
+.modes button{flex:1;border:none;background:none;padding:9px;border-radius:11px;font-weight:700;
+  font-size:.82em;color:var(--muted);cursor:pointer;font-family:inherit}
+.modes button.on{background:var(--green);color:#fff}
+/* cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.ctitle{font-size:.72em;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:10px}
+.big{font-size:2.1em;font-weight:800;letter-spacing:-1px}
+.sub{color:var(--muted);font-size:.76em}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--border);
+  border-radius:999px;padding:5px 11px;font-size:.7em;font-weight:700;color:var(--muted)}
+.chip.green{background:rgba(15,157,110,.12);color:var(--green-d);border-color:transparent}
+.chip.gold{background:rgba(224,164,22,.14);color:#9a7100;border-color:transparent}
+.chip.red{background:rgba(229,72,77,.12);color:#b3261e;border-color:transparent}
+/* progress ring */
+.ringwrap{display:flex;align-items:center;gap:16px}
+.ring{position:relative;width:96px;height:96px;flex-shrink:0}
+.ring svg{transform:rotate(-90deg)}
+.ring .pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .pct b{font-size:1.15em;font-weight:800}
+.ring .pct span{font-size:.56em;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.bar{height:9px;border-radius:99px;background:var(--card2);overflow:hidden;border:1px solid var(--border)}
+.bar i{display:block;height:100%;background:var(--green);border-radius:99px;transition:width .4s}
+.bar i.warn{background:var(--gold)} .bar i.over{background:var(--red)}
+/* stat grid */
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.stat{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:10px 6px;text-align:center}
+.stat b{display:block;font-size:1em;font-weight:800}
+.stat span{display:block;font-size:.58em;color:var(--muted);margin-top:2px;line-height:1.25}
+/* list rows */
+.row{display:flex;align-items:center;gap:12px;padding:12px;background:var(--card2);border:1px solid var(--border);
+  border-radius:14px;margin-bottom:8px}
+.row .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.05em;flex-shrink:0;background:var(--card)}
+.row .mid{flex:1;min-width:0}
+.row .nm{font-weight:700;font-size:.86em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .mt{font-size:.68em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .amt{font-weight:800;font-size:.86em;text-align:right;white-space:nowrap}
+.pos{color:var(--green-d)} .neg{color:var(--red)}
+/* form */
+label{display:block;font-size:.7em;color:var(--muted);font-weight:700;margin:10px 0 4px;letter-spacing:.4px}
+input,select,textarea{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);
+  background:var(--card2);color:var(--text);font-size:.9em;font-family:inherit}
+input:focus,select:focus{outline:2px solid var(--green);outline-offset:0}
+.btn{width:100%;padding:14px;border-radius:14px;border:none;background:var(--green);color:#fff;
+  font-weight:800;font-size:.92em;cursor:pointer;font-family:inherit;margin-top:12px}
+.btn.ghost{background:var(--card2);color:var(--text);border:1px solid var(--border)}
+.btn.red{background:var(--red)}
+.btn.gold{background:var(--gold);color:#231a00}
+/* pages */
+.page{display:none;animation:fade .25s ease}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sec{font-size:.72em;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin:18px 0 8px}
+/* nav */
+.tabbar{position:fixed;bottom:0;left:0;right:0;max-width:600px;margin:0 auto;background:var(--card);
+  border-top:1px solid var(--border);display:flex;padding:6px 2px;z-index:100;box-shadow:0 -3px 16px rgba(0,0,0,.06)}
+.tabbar button{flex:1 1 0;min-width:0;border:none;background:none;color:var(--muted);font-family:inherit;
+  font-size:.56em;font-weight:700;padding:6px 1px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabbar button .i{font-size:1.5em;line-height:1}
+.tabbar button.on{color:var(--green)}
+.tabbar button.on .i{transform:translateY(-1px) scale(1.08)}
+/* modal */
+.mask{position:fixed;inset:0;background:rgba(6,20,16,.45);display:none;z-index:200;align-items:flex-end}
+.mask.on{display:flex}
+.sheet{background:var(--card);width:100%;max-width:600px;margin:0 auto;border-radius:22px 22px 0 0;
+  padding:18px;max-height:88vh;overflow-y:auto}
+.sheet h3{margin:0 0 6px;font-size:1.05em}
+.acc{background:var(--card2);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.acc summary{padding:13px;font-weight:700;font-size:.84em;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary::after{content:'\25be';margin-left:auto;color:var(--muted)}
+.acc[open] summary::after{transform:rotate(180deg)}
+.acc .bd{padding:0 13px 13px}
+.empty{text-align:center;color:var(--muted);font-size:.82em;padding:26px 10px}
+canvas{width:100%;display:block}
+.tag{font-size:.6em;font-weight:800;padding:3px 8px;border-radius:99px}
+.tag.pend{background:rgba(224,164,22,.16);color:#8a6500}
+.tag.done{background:rgba(15,157,110,.14);color:var(--green-d)}
+.tag.new{background:rgba(59,130,246,.14);color:#1d4ed8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="toprow">
+      <div class="brand">ധനം<span class="ml">Dhanam · money, made clear</span></div>
+      <div class="spacer"></div>
+      <div class="iconbtn" onclick="toggleDark()" id="dm">🌙</div>
+      <div class="iconbtn" onclick="openSheet('settings')">⚙️</div>
+    </div>
+    <div class="greet" id="greet">Hello</div>
+    <div class="gdate" id="gdate"></div>
+    <div class="modes">
+      <button id="mMe" class="on" onclick="setMode('me')">👤 Me</button>
+      <button id="mCouple" onclick="setMode('couple')">🤝 Couple</button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="page active" id="p-home">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="ctitle" style="margin:0">Spent this month</div>
+        <div class="chip" id="budgetChip">No budget set</div>
+      </div>
+      <div class="ringwrap" style="margin-top:12px">
+        <div class="ring">
+          <svg width="96" height="96"><circle cx="48" cy="48" r="40" stroke="var(--card2)" stroke-width="10" fill="none"></circle>
+          <circle id="ringArc" cx="48" cy="48" r="40" stroke="var(--green)" stroke-width="10" fill="none"
+            stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251"></circle></svg>
+          <div class="pct"><b id="ringPct">0%</b><span>used</span></div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="big" id="spentMonth">₹0</div>
+          <div class="sub" id="spentSub">set a budget to track progress</div>
+          <div style="margin-top:10px"><button class="btn ghost" style="margin:0;padding:9px;font-size:.78em" onclick="openSheet('expense')">+ Add Expense</button></div>
+        </div>
+      </div>
+      <div class="bar" style="margin-top:14px"><i id="budgetBar" style="width:0%"></i></div>
+      <div class="sub" style="margin-top:6px" id="budgetNote">No limits this month</div>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">Daily snapshot</div>
+      <div class="grid4">
+        <div class="stat"><b id="dToday" class="pos">₹0</b><span>Today</span></div>
+        <div class="stat"><b id="dAvg">—</b><span>Avg / day</span></div>
+        <div class="stat"><b id="dBudget">—</b><span>Day budget</span></div>
+        <div class="stat"><b id="dLeft">—</b><span>Left today</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">Debt overview</div>
+      <div class="grid3">
+        <div class="stat"><b id="hPeople" class="neg">—</b><span>Owed to people</span></div>
+        <div class="stat"><b id="hLoans" class="neg">—</b><span>Loans left</span></div>
+        <div class="stat"><b id="hMonthly" class="neg">—</b><span>Monthly out</span></div>
+      </div>
+      <div class="sub" style="margin-top:10px" id="hKuri"></div>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">Where it went</div>
+      <canvas id="catChart" height="150"></canvas>
+      <div id="catLegend"></div>
+    </div>
+  </div>
+
+  <!-- EXPENSES -->
+  <div class="page" id="p-exp">
+    <div class="card">
+      <div class="ctitle">Add expense</div>
+      <label>Amount</label><input type="number" id="eAmt" placeholder="0" inputmode="decimal">
+      <label>Category</label>
+      <select id="eCat">
+        <option>Food & Grocery</option><option>Rent & Bills</option><option>Transport</option>
+        <option>Health</option><option>Education</option><option>Family / Home</option>
+        <option>Debt Payment</option><option>Kuri / Savings</option><option>Other</option>
+      </select>
+      <div class="grid2">
+        <div><label>Currency</label><select id="eCur"><option>AED</option><option>INR</option></select></div>
+        <div><label>Date</label><input type="date" id="eDate"></div>
+      </div>
+      <label>Note (optional)</label><input type="text" id="eNote" placeholder="e.g. Vegetables">
+      <div class="grid2">
+        <div><label>For</label><select id="eWho"><option>Me</option><option>Couple</option></select></div>
+        <div style="display:flex;align-items:flex-end"><button class="btn" onclick="addExpense()">Save expense</button></div>
+      </div>
+    </div>
+    <div class="sec">This month</div>
+    <div id="expList"></div>
+  </div>
+
+  <!-- INCOME -->
+  <div class="page" id="p-inc">
+    <div class="card">
+      <div class="ctitle">Add income</div>
+      <label>Source</label><input type="text" id="iSrc" placeholder="e.g. Salary, Freelance">
+      <div class="grid2">
+        <div><label>Amount</label><input type="number" id="iAmt" placeholder="0" inputmode="decimal"></div>
+        <div><label>Currency</label><select id="iCur"><option>AED</option><option>INR</option></select></div>
+      </div>
+      <label>Date</label><input type="date" id="iDate">
+      <button class="btn" onclick="addIncome()">Save income</button>
+    </div>
+    <div class="card">
+      <div class="ctitle">This month</div>
+      <div class="grid2">
+        <div class="stat"><b id="incMonth" class="pos">₹0</b><span>Income received</span></div>
+        <div class="stat"><b id="incNet">₹0</b><span>Income − Spent</span></div>
+      </div>
+      <div class="sub" style="margin-top:10px" id="incSalary"></div>
+    </div>
+    <div class="sec">Income history</div>
+    <div id="incList"></div>
+  </div>
+
+  <!-- DEBTS -->
+  <div class="page" id="p-debt">
+    <div class="card">
+      <div class="ctitle">Total position</div>
+      <div class="grid3">
+        <div class="stat"><b id="dbTotal" class="neg">—</b><span>Total debt</span></div>
+        <div class="stat"><b id="dbPaid" class="pos">—</b><span>Paid so far</span></div>
+        <div class="stat"><b id="dbBalance" class="neg">—</b><span>Balance left</span></div>
+      </div>
+      <div class="bar" style="margin-top:12px"><i id="dbBar" style="width:0%"></i></div>
+      <div class="sub" id="dbPct" style="margin-top:6px">—</div>
+      <div class="grid3" style="margin-top:10px">
+        <div class="stat"><b id="dbMonthly" class="neg">—</b><span>Monthly out</span></div>
+        <div class="stat"><b id="dbCount">—</b><span>Active items</span></div>
+        <div class="stat"><b id="dbPeople" class="neg">—</b><span>To people</span></div>
+      </div>
+    </div>
+
+    <div class="sec">People I owe</div>
+    <div id="peopleList"></div>
+
+    <div class="sec">Loans & Debts</div>
+    <div id="loanList"></div>
+
+    <button class="btn ghost" onclick="openSheet('debt')">+ Add debt / loan</button>
+
+    <div class="sec">Recent repayments</div>
+    <div id="repayList"></div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="page" id="p-tips">
+    <div class="card">
+      <div class="ctitle">Your money coach</div>
+      <div class="sub" id="tipsHead">Personalised tips from your own numbers.</div>
+      <div class="grid3" style="margin-top:12px">
+        <div class="stat"><b id="tpCount">—</b><span>Tips</span></div>
+        <div class="stat"><b id="tpWarn" class="neg">—</b><span>Alerts</span></div>
+        <div class="stat"><b id="tpDebtFree" class="pos">—</b><span>Debt-free by</span></div>
+      </div>
+    </div>
+    <div id="tipsList"></div>
+    <div class="card">
+      <div class="ctitle">Money rules to live by</div>
+      <div id="rulesList"></div>
+    </div>
+  </div>
+
+  <!-- KURI -->
+  <div class="page" id="p-kuri">
+    <div class="card">
+      <div class="ctitle">Kuri / Savings</div>
+      <div class="grid3">
+        <div class="stat"><b id="kuMonthly" class="neg">—</b><span>Monthly in</span></div>
+        <div class="stat"><b id="kuPaid" class="pos">—</b><span>Paid so far</span></div>
+        <div class="stat"><b id="kuMature" class="pos">—</b><span>Total value</span></div>
+      </div>
+    </div>
+    <div id="kuriList"></div>
+    <button class="btn ghost" onclick="openSheet('kuri')">+ Add kuri</button>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="p-set">
+    <div class="card">
+      <div class="ctitle">Money settings</div>
+      <label>Monthly budget (INR)</label><input type="number" id="sBudget" placeholder="0" inputmode="decimal">
+      <label>Monthly salary (AED)</label><input type="number" id="sSalary" placeholder="1400" inputmode="decimal">
+      <label>AED → INR rate</label><input type="number" id="sRate" step="0.01" placeholder="24.69" inputmode="decimal">
+      <button class="btn" onclick="saveSettings()">Save settings</button>
+    </div>
+    <div class="card">
+      <div class="ctitle">Data</div>
+      <button class="btn ghost" onclick="exportData()">⬇ Export backup (JSON)</button>
+      <button class="btn ghost" onclick="importData()">⬆ Import backup</button>
+      <button class="btn red" onclick="resetData()">Reset all data</button>
+      <div class="sub" style="margin-top:10px">Everything is stored only on this device (localStorage). No server, no login.</div>
+    </div>
+    <div class="card">
+      <div class="ctitle">About</div>
+      <div class="sub">Dhanam · ധനം — a companion to VipaNanam. Built for Shafeeq.<br>Version 1.0 · <span id="aboutDate"></span></div>
+    </div>
+  </div>
+</div>
+
+<nav class="tabbar">
+  <button class="on" onclick="go('home',this)"><span class="i">🏠</span>Home</button>
+  <button onclick="go('exp',this)"><span class="i">💸</span>Expenses</button>
+  <button onclick="go('inc',this)"><span class="i">💰</span>Income</button>
+  <button onclick="go('debt',this)"><span class="i">🏦</span>Debts</button>
+  <button onclick="go('kuri',this)"><span class="i">🎯</span>Kuri</button>
+  <button onclick="go('tips',this)"><span class="i">💡</span>Tips</button>
+  <button onclick="go('set',this)"><span class="i">⚙️</span>Settings</button>
+</nav>
+
+<div class="mask" id="mask" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet" id="sheetBody"></div>
+</div>
+
+<script>
+/* ================= STATE ================= */
+var KEY='dhanam_v1';
+var SEED={
+  meta:{rate:24.69,salaryAED:1400,budget:0,mode:'me',dark:false},
+  income:[], expenses:[],
+  people:[
+    {id:'p1',name:'KUTTIMON',amount:3500,total:3500,paidAmount:0,currency:'INR',status:'pending'},
+    {id:'p2',name:'ABU BASHAR',amount:830,total:830,paidAmount:0,currency:'AED',status:'pending'},
+    {id:'p3',name:'MAMU',amount:100,total:100,paidAmount:100,currency:'AED',status:'closed'},
+    {id:'p4',name:'FAIZAL',amount:25200,total:25200,paidAmount:25200,currency:'INR',status:'closed'},
+    {id:'p5',name:'VAVA',amount:3200,total:3200,paidAmount:3200,currency:'INR',status:'closed'},
+    {id:'p6',name:'SUTTU',amount:2200,total:2200,paidAmount:2200,currency:'INR',status:'closed'},
+    {id:'p7',name:'HISHAM',amount:2500,total:2500,paidAmount:2500,currency:'INR',status:'closed'}
+  ],
+  repayments:[],
+  loans:[
+    {id:'l1',name:"Lingage by Shalu's Home",monthly:12000,months:27,paid:7,total:324000,paidAmount:84000,currency:'INR',status:'pending',note:'0% chit · 20 months left'},
+    {id:'l2',name:'Gold Loan',lump:210000,total:210000,paidAmount:0,due:'2027-01-01',currency:'INR',status:'pending',note:'CHAIN · renew or clear by Jan 2027'},
+    {id:'l3',name:'UKO Bank Loan',monthly:5200,months:48,paid:8,total:249600,paidAmount:41600,currency:'INR',status:'pending',note:'low interest · 40 months left'},
+    {id:'l4',name:'Adav Dubai (new plan)',monthly:300,months:3,paid:0,total:900,paidAmount:0,currency:'AED',status:'pending',note:'starts next month',isNew:true},
+    {id:'l5',name:'Ticket loan',monthly:3267,months:6,paid:0,total:19602,paidAmount:0,currency:'INR',status:'pending',note:'for ticket · starts next month',isNew:true},
+    {id:'l6',name:'LT FINANCE',monthly:8880,months:48,paid:0,total:426240,paidAmount:0,principal:300000,serviceCharge:10000,start:'2026-11-03',currency:'INR',status:'pending',note:'new loan · 48 months · from 03 Nov 2026 · service charge 10,000',isNew:true},
+    {id:'l7',name:'Lingage by Home',monthly:4000,months:13,paid:13,total:52000,paidAmount:52000,currency:'INR',status:'closed'},
+    {id:'l8',name:'Kudubashree Loan',lump:15000,total:15000,paidAmount:15000,currency:'INR',status:'closed'},
+    {id:'l9',name:'Bajaj Loan',monthly:4098,months:8,paid:8,total:32784,paidAmount:32784,currency:'INR',status:'closed'},
+    {id:'l10',name:'Adav Dubai (old)',monthly:355,months:4,paid:4,total:1420,paidAmount:1420,currency:'AED',status:'closed'}
+  ],
+  kuri:[
+    {id:'k1',name:'Faizal Kuri',monthly:3750,months:40,paid:9,currency:'INR',status:'active'},
+    {id:'k2',name:'Kunithatha Kuri (Chittiyan)',monthly:2000,months:15,paid:6,currency:'INR',status:'active'},
+    {id:'k3',name:'New Kuri',monthly:5000,months:10,paid:0,currency:'INR',status:'active',isNew:true}
+  ]
+};
+var S = load();
+function load(){ try{ var r=JSON.parse(localStorage.getItem(KEY)); return (r&&r.meta)?r:JSON.parse(JSON.stringify(SEED)); }catch(e){ return JSON.parse(JSON.stringify(SEED)); } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+/* ================= HELPERS ================= */
+function rate(){ return Number(S.meta.rate)||24.69; }
+function toINR(a,c){ a=Number(a)||0; return (c==='AED')? a*rate() : a; }
+function money(a,c){ // format in the given currency
+  a=Number(a)||0; var sym = (c==='AED')?'AED ':'₹';
+  return sym + a.toLocaleString('en-IN',{maximumFractionDigits:2});
+}
+function inr(a){ return '₹' + Math.round(Number(a)||0).toLocaleString('en-IN'); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function ym(d){ return String(d||'').slice(0,7); }
+function thisYM(){ return today().slice(0,7); }
+function daysInMonth(){ var n=new Date(); return new Date(n.getFullYear(), n.getMonth()+1, 0).getDate(); }
+function dayOfMonth(){ return new Date().getDate(); }
+
+/* ================= NAV ================= */
+function go(id, btn){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  var el=document.getElementById('p-'+id); if(el) el.classList.add('active');
+  document.querySelectorAll('.tabbar button').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  window.scrollTo(0,0);
+  if(id==='home') renderHome();
+  if(id==='exp') renderExp();
+  if(id==='inc') renderInc();
+  if(id==='debt') renderDebt();
+  if(id==='kuri') renderKuri();
+  if(id==='tips') renderTips();
+  if(id==='set') renderSet();
+}
+function setMode(m){ S.meta.mode=m; save(); renderModes(); renderAll(); }
+function renderModes(){
+  document.getElementById('mMe').classList.toggle('on', S.meta.mode==='me');
+  document.getElementById('mCouple').classList.toggle('on', S.meta.mode==='couple');
+}
+function toggleDark(){
+  S.meta.dark=!S.meta.dark; save();
+  document.body.classList.toggle('dark', S.meta.dark);
+  document.getElementById('dm').textContent = S.meta.dark?'☀️':'🌙';
+  renderAll();
+}
+
+/* ================= CALC ================= */
+function monthExpenses(){
+  var k=thisYM();
+  return S.expenses.filter(function(e){
+    if(ym(e.date)!==k) return false;
+    if(S.meta.mode==='me' && e.who==='Couple') return false;
+    return true;
+  });
+}
+function monthIncome(){
+  var k=thisYM();
+  return S.income.filter(function(e){ return ym(e.date)===k; });
+}
+function pendingPeople(){ return S.people.filter(function(p){ return p.status!=='closed'; }); }
+function pendingLoans(){ return S.loans.filter(function(l){ return l.status!=='closed'; }); }
+function activeKuri(){ return S.kuri.filter(function(k){ return k.status!=='closed'; }); }
+function personTotal(p){ return toINR((p.total!=null?p.total:p.amount), p.currency); }
+function personPaid(p){ return toINR(Number(p.paidAmount)||0, p.currency); }
+function personBalance(p){ return Math.max(0, personTotal(p)-personPaid(p)); }
+function findItem(kind,id){ return ((kind==='people'?S.people:S.loans)||[]).find(function(x){return x.id===id;}); }
+function itemName(kind,id){ var x=findItem(kind,id); return x?x.name:'(deleted)'; }
+function loanMonthly(l){ return (l.lump?0:Number(l.monthly)||0); }
+function loanTotal(l){
+  if(l.total!=null && l.total!=='') return toINR(l.total,l.currency);
+  if(l.lump) return toINR(l.lump,l.currency);
+  return toINR((Number(l.months)||0)*(Number(l.monthly)||0), l.currency);
+}
+function loanPaid(l){ return toINR(Number(l.paidAmount)||0, l.currency); }
+function loanBalance(l){ return Math.max(0, loanTotal(l)-loanPaid(l)); }
+
+/* ================= HOME ================= */
+function renderHome(){
+  var now=new Date();
+  var hr=now.getHours();
+  var g = hr<12?'Good morning':(hr<17?'Good afternoon':'Good evening');
+  document.getElementById('greet').textContent = g + ', Shafeeq';
+  document.getElementById('gdate').textContent = now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+
+  var spent=monthExpenses().reduce(function(s,e){ return s+toINR(e.amount,e.currency); },0);
+  var budget=Number(S.meta.budget)||0;
+  var pct = budget>0 ? Math.min(100, Math.round(spent/budget*100)) : 0;
+
+  document.getElementById('spentMonth').textContent = inr(spent);
+  document.getElementById('spentSub').textContent = budget>0 ? ('of ' + inr(budget) + ' budget') : 'set a budget to track progress';
+  document.getElementById('ringPct').textContent = (budget>0?pct:0)+'%';
+  var arc=document.getElementById('ringArc');
+  arc.setAttribute('stroke-dashoffset', String(251 - 251*(budget>0?pct:0)/100));
+  arc.setAttribute('stroke', pct>=100?'var(--red)':(pct>=80?'var(--gold)':'var(--green)'));
+  var chip=document.getElementById('budgetChip');
+  if(budget<=0){ chip.textContent='No budget set'; chip.className='chip'; }
+  else if(spent>budget){ chip.textContent='Over budget'; chip.className='chip red'; }
+  else if(pct>=80){ chip.textContent='Close to limit'; chip.className='chip gold'; }
+  else { chip.textContent='On track'; chip.className='chip green'; }
+  var bar=document.getElementById('budgetBar');
+  bar.style.width = (budget>0?Math.min(100,pct):0)+'%';
+  bar.className = (budget>0 && spent>budget)?'over':(pct>=80?'warn':'');
+  document.getElementById('budgetNote').textContent = budget>0
+    ? (spent>budget ? ('Over by '+inr(spent-budget)) : (inr(budget-spent)+' left this month'))
+    : 'No limits this month';
+
+  // daily snapshot
+  var t=0;
+  S.expenses.forEach(function(e){ if(e.date===today() && !(S.meta.mode==='me'&&e.who==='Couple')) t+=toINR(e.amount,e.currency); });
+  document.getElementById('dToday').textContent = inr(t);
+  var dom=dayOfMonth();
+  document.getElementById('dAvg').textContent = dom>0? inr(spent/dom) : '—';
+  var dayB = budget>0? budget/daysInMonth() : 0;
+  document.getElementById('dBudget').textContent = budget>0? inr(dayB) : '—';
+  document.getElementById('dLeft').textContent = budget>0? inr(Math.max(0,dayB-t)) : '—';
+
+  // debt overview
+  var pp=pendingPeople().reduce(function(s,p){ return s+toINR(p.amount,p.currency); },0);
+  var pl=pendingLoans().reduce(function(s,l){ return s+loanBalance(l); },0);
+  var pm=pendingLoans().reduce(function(s,l){ return s+toINR(loanMonthly(l),l.currency); },0);
+  document.getElementById('hPeople').textContent = inr(pp);
+  document.getElementById('hLoans').textContent = inr(pl);
+  document.getElementById('hMonthly').textContent = inr(pm);
+  var km=activeKuri().reduce(function(s,k){ return s+toINR(k.monthly,k.currency); },0);
+  document.getElementById('hKuri').textContent = 'Kuri going out: ' + inr(km) + '/month';
+
+  drawCat();
+}
+
+function drawCat(){
+  var cv=document.getElementById('catChart'); if(!cv) return;
+  var ctx=cv.getContext('2d'); if(!ctx) return;
+  var W=cv.width=cv.clientWidth||340, H=cv.height=150;
+  ctx.clearRect(0,0,W,H);
+  var map={};
+  monthExpenses().forEach(function(e){ map[e.cat]=(map[e.cat]||0)+toINR(e.amount,e.currency); });
+  var keys=Object.keys(map).sort(function(a,b){return map[b]-map[a];}).slice(0,6);
+  var leg=document.getElementById('catLegend');
+  if(!keys.length){ ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--muted');
+    ctx.font='13px sans-serif'; ctx.textAlign='center'; ctx.fillText('No spending yet this month', W/2, H/2); if(leg) leg.innerHTML=''; return; }
+  var total=keys.reduce(function(s,k){return s+map[k];},0);
+  var cols=['#0f9d6e','#e0a416','#3b82f6','#8b5cf6','#e5484d','#14b8a6'];
+  var max=map[keys[0]], bw=Math.max(10,(W-120)/keys.length-10);
+  keys.forEach(function(k,i){
+    var h=(map[k]/max)*(H-30);
+    ctx.fillStyle=cols[i%cols.length];
+    var x=10+i*((W-120)/keys.length);
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x,H-20-h,bw,h,6) : ctx.rect(x,H-20-h,bw,h); ctx.fill();
+    ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--text');
+    ctx.font='700 9px sans-serif'; ctx.textAlign='left';
+    ctx.fillText(k.split(' ')[0].slice(0,8), x, H-6);
+  });
+  if(leg) leg.innerHTML = keys.map(function(k,i){
+    return '<div style="display:flex;align-items:center;gap:7px;font-size:.72em;margin-top:6px">'
+      +'<span style="width:9px;height:9px;border-radius:3px;background:'+cols[i%cols.length]+'"></span>'
+      +'<span style="flex:1">'+k+'</span><b>'+inr(map[k])+'</b>'
+      +'<span style="color:var(--muted)">'+Math.round(map[k]/total*100)+'%</span></div>';
+  }).join('');
+}
+
+/* ================= EXPENSES ================= */
+function addExpense(){
+  var a=parseFloat(document.getElementById('eAmt').value);
+  if(!a||a<=0){ alert('Enter an amount'); return; }
+  S.expenses.push({id:'e'+Date.now(), amount:a, cat:document.getElementById('eCat').value,
+    currency:document.getElementById('eCur').value, date:document.getElementById('eDate').value||today(),
+    note:document.getElementById('eNote').value.trim(), who:document.getElementById('eWho').value});
+  save();
+  document.getElementById('eAmt').value=''; document.getElementById('eNote').value='';
+  renderExp(); renderHome();
+  toast('Expense saved');
+}
+function renderExp(){
+  var el=document.getElementById('expList');
+  var list=monthExpenses().slice().reverse();
+  if(!list.length){ el.innerHTML='<div class="empty">No expenses this month yet.<br>Tap Add Expense to record your first one.</div>'; return; }
+  el.innerHTML=list.map(function(e){
+    return '<div class="row"><div class="ic">💸</div><div class="mid"><div class="nm">'+(e.note||e.cat)+'</div>'
+      +'<div class="mt">'+e.cat+' · '+e.date+(e.who==='Couple'?' · 🤝':'')+'</div></div>'
+      +'<div><div class="amt neg">'+money(e.amount,e.currency)+'</div>'
+      +'<div class="mt" style="text-align:right">'+inr(toINR(e.amount,e.currency))+'</div></div>'
+      +'<div class="iconbtn" style="width:30px;height:30px;font-size:.8em" onclick="delExpense(\''+e.id+'\')">✕</div></div>';
+  }).join('');
+}
+function delExpense(id){ S.expenses=S.expenses.filter(function(e){return e.id!==id;}); save(); renderExp(); renderHome(); }
+
+/* ================= INCOME ================= */
+function addIncome(){
+  var a=parseFloat(document.getElementById('iAmt').value);
+  var src=document.getElementById('iSrc').value.trim()||'Income';
+  if(!a||a<=0){ alert('Enter an amount'); return; }
+  S.income.push({id:'i'+Date.now(), amount:a, source:src,
+    currency:document.getElementById('iCur').value, date:document.getElementById('iDate').value||today()});
+  save();
+  document.getElementById('iAmt').value=''; document.getElementById('iSrc').value='';
+  renderInc(); renderHome();
+  toast('Income saved');
+}
+function renderInc(){
+  var inc=monthIncome().reduce(function(s,e){ return s+toINR(e.amount,e.currency); },0);
+  var spent=monthExpenses().reduce(function(s,e){ return s+toINR(e.amount,e.currency); },0);
+  document.getElementById('incMonth').textContent = inr(inc);
+  var net=inc-spent;
+  var n=document.getElementById('incNet');
+  n.textContent = inr(net); n.className = net>=0?'pos':'neg';
+  document.getElementById('incSalary').textContent = 'Salary setting: ' + money(S.meta.salaryAED,'AED')
+    + ' ≈ ' + inr(toINR(S.meta.salaryAED,'AED')) + '/month';
+  var el=document.getElementById('incList');
+  var list=S.income.slice().reverse();
+  if(!list.length){ el.innerHTML='<div class="empty">No income recorded yet.</div>'; return; }
+  el.innerHTML=list.map(function(e){
+    return '<div class="row"><div class="ic">💰</div><div class="mid"><div class="nm">'+e.source+'</div>'
+      +'<div class="mt">'+e.date+'</div></div><div class="amt pos">'+money(e.amount,e.currency)+'</div>'
+      +'<div class="iconbtn" style="width:30px;height:30px;font-size:.8em" onclick="delIncome(\''+e.id+'\')">✕</div></div>';
+  }).join('');
+}
+function delIncome(id){ S.income=S.income.filter(function(e){return e.id!==id;}); save(); renderInc(); renderHome(); }
+
+/* ================= DEBTS ================= */
+function renderDebt(){
+  var pp=pendingPeople(), pl=pendingLoans();
+  var tot=pl.reduce(function(s,l){return s+loanTotal(l);},0);
+  var paid=pl.reduce(function(s,l){return s+loanPaid(l);},0);
+  var bal=pl.reduce(function(s,l){return s+loanBalance(l);},0);
+  var ppl=pp.reduce(function(s,p){return s+personBalance(p);},0);
+  var pplTot=pp.reduce(function(s,p){return s+personTotal(p);},0);
+  var mon=pl.reduce(function(s,l){return s+toINR(loanMonthly(l),l.currency);},0);
+  document.getElementById('dbTotal').textContent = inr(tot+pplTot);
+  document.getElementById('dbPaid').textContent = inr(paid);
+  document.getElementById('dbBalance').textContent = inr(bal + ppl);
+  var pct = (tot+pplTot)>0 ? Math.round(paid/(tot+pplTot)*100) : 0;
+  document.getElementById('dbBar').style.width = pct+'%';
+  document.getElementById('dbPct').textContent = 'Loans: '+inr(paid)+' paid of '+inr(tot)+' ('+pct+'%) \u00b7 people '+inr(ppl)+' still to pay';
+  document.getElementById('dbMonthly').textContent = inr(mon);
+  document.getElementById('dbCount').textContent = (pp.length+pl.length);
+  document.getElementById('dbPeople').textContent = inr(ppl);
+
+  document.getElementById('peopleList').innerHTML = pp.length? pp.map(function(p){
+    var t=personTotal(p), pd=personPaid(p), b=personBalance(p);
+    var pct3 = t>0 ? Math.round(pd/t*100) : 0;
+    return '<div class="row" style="flex-wrap:wrap"><div class="ic">\ud83d\udc64</div><div class="mid">'
+      +'<div class="nm">'+p.name+'</div>'
+      +'<div class="mt">'+(p.currency==='AED'? money(t,'AED') : inr(t))+' total</div>'
+      +'<div class="bar" style="margin-top:7px"><i style="width:'+pct3+'%"></i></div>'
+      +'<div style="margin-top:5px;font-size:.68em;color:var(--muted);line-height:1.5;white-space:normal">Total '+inr(t)+' \u00b7 Paid '+inr(pd)+' \u00b7 <b style="color:var(--text)">Balance '+inr(b)+'</b></div>'
+      +'</div><div style="text-align:right"><div class="amt neg">'+inr(b)+'</div>'
+      +'<button class="btn" style="padding:7px 10px;font-size:.7em;margin-top:7px" onclick="openRepay(\'people\',\''+p.id+'\')">\ud83d\udcb5 Repay</button>'
+      +'<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px">'
+      +'<div class="iconbtn" style="width:30px;height:30px;font-size:.8em" onclick="openEdit(\'people\',\''+p.id+'\')">\u270f\ufe0f</div>'
+      +'<div class="iconbtn" style="width:30px;height:30px;font-size:.8em" onclick="delItem(\'people\',\''+p.id+'\')">\ud83d\uddd1\ufe0f</div>'
+      +'<div class="iconbtn" style="width:30px;height:30px;font-size:.8em" onclick="closeItem(\'people\',\''+p.id+'\')">\u2713</div>'
+      +'</div></div></div>';
+  }).join('') : '<div class="empty">No pending people debts. \u2705</div>';
+
+  document.getElementById('loanList').innerHTML = pl.length? pl.map(function(l){
+    var t=loanTotal(l), pd=loanPaid(l), b=loanBalance(l);
+    var pct2 = t>0 ? Math.round(pd/t*100) : 0;
+    var meta = (Number(l.monthly)>0) ? (money(l.monthly,l.currency)+'/mo \u00b7 '+(l.paid||0)+'/'+(l.months||0)+' months') : (l.lump? ('lump sum \u00b7 due '+(l.due||'\u2014')) : 'details pending');
+    return '<div class="row" style="flex-wrap:wrap"><div class="ic">\ud83c\udfe6</div><div class="mid">'
+      +'<div class="nm">'+l.name+(l.isNew?' <span class="tag new">new</span>':'')+'</div>'
+      +'<div class="mt">'+meta+'</div>'
+      +'<div class="bar" style="margin-top:7px"><i style="width:'+pct2+'%"></i></div>'
+      +'<div style="margin-top:5px;font-size:.68em;color:var(--muted);line-height:1.5;white-space:normal">Total '+inr(t)+' \u00b7 Paid '+inr(pd)+' \u00b7 <b style="color:var(--text)">Balance '+inr(b)+'</b>'+(l.note?'<br>'+l.note:'')+'</div>'
+      +'</div><div style="text-align:right"><div class="amt neg">'+inr(b)+'</div>'
+      +'<button class="btn" style="padding:7px 10px;font-size:.7em;margin-top:7px" onclick="openRepay(\'loans\',\''+l.id+'\')">\ud83d\udcb5 Repay</button>'
+      +'<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px">'
+      +'<div class="iconbtn" style="width:30px;height:30px;font-size:.8em" onclick="openEdit(\'loans\',\''+l.id+'\')">\u270f\ufe0f</div>'
+      +'<div class="iconbtn" style="width:30px;height:30px;font-size:.8em" onclick="delItem(\'loans\',\''+l.id+'\')">\ud83d\uddd1\ufe0f</div>'
+      +'<div class="iconbtn" style="width:30px;height:30px;font-size:.8em" onclick="closeItem(\'loans\',\''+l.id+'\')">\u2713</div>'
+      +'</div></div></div>';
+  }).join('') : '<div class="empty">No pending loans. \u2705</div>';
+
+  var rp=(S.repayments||[]).slice(-12).reverse();
+  document.getElementById('repayList').innerHTML = rp.length? rp.map(function(r){
+    var nm=itemName(r.kind||'loans', r.loanId||r.refId);
+    return '<div class="row"><div class="ic">\ud83d\udcb5</div><div class="mid"><div class="nm">'+nm+'</div>'
+      +'<div class="mt">'+(r.kind==='people'?'\ud83d\udc64 person \u00b7 ':'\ud83c\udfe6 loan \u00b7 ')+r.date+(r.note?' \u00b7 '+r.note:'')+'</div></div>'
+      +'<div class="amt pos">'+money(r.amount,r.currency)+'</div></div>';
+  }).join('') : '<div class="empty">No repayments recorded yet. Tap \ud83d\udcb5 Repay on any item.</div>';
+}
+function openRepay(kind,id){
+  var x=findItem(kind,id); if(!x) return;
+  var bal = kind==='people'? personBalance(x) : loanBalance(x);
+  var cur = x.currency||'INR';
+  var b=document.getElementById('sheetBody');
+  b.innerHTML='<h3>\ud83d\udcb5 Repay \u00b7 '+x.name+'</h3>'
+    +'<div class="sub" style="margin-bottom:6px">Balance: <b>'+inr(bal)+'</b></div>'
+    +'<label>Amount paid</label><input type="number" id="rpAmt" placeholder="0" inputmode="decimal">'
+    +'<label>Currency</label><select id="rpCur"><option'+(cur==='INR'?' selected':'')+'>INR</option><option'+(cur==='AED'?' selected':'')+'>AED</option></select>'
+    +'<label>Date</label><input type="date" id="rpDate" value="'+today()+'">'
+    +'<label>Note (optional)</label><input id="rpNote" placeholder="e.g. October payment">'
+    +'<button class="btn" onclick="doRepay(\''+kind+'\',\''+id+'\')">Save repayment</button>'
+    +'<button class="btn ghost" onclick="closeSheet()">Cancel</button>';
+  document.getElementById('mask').classList.add('on');
+}
+function doRepay(kind,id){
+  var x=findItem(kind,id); if(!x) return;
+  var a=parseFloat(document.getElementById('rpAmt').value);
+  if(!a||a<=0){ alert('Enter an amount'); return; }
+  var cur=document.getElementById('rpCur').value;
+  var inCur = (cur===x.currency) ? a : (cur==='AED' ? a*rate() : a/rate());
+  x.paidAmount=(Number(x.paidAmount)||0)+inCur;
+  if(kind==='loans' && Number(x.monthly)>0 && Number(x.months)>0){
+    x.paid = Math.min(Number(x.months), Math.round((Number(x.paidAmount)||0)/Number(x.monthly)));
+  }
+  S.repayments=S.repayments||[];
+  S.repayments.push({id:'r'+Date.now(),kind:kind,loanId:id,refId:id,
+    date:document.getElementById('rpDate').value||today(), amount:a,currency:cur,
+    note:document.getElementById('rpNote').value.trim()});
+  var balNow = kind==='people'? personBalance(x) : loanBalance(x);
+  if(balNow<=0.01) x.status='closed';
+  save(); closeSheet(); renderDebt(); renderHome();
+  toast('Repayment recorded \u2713');
+}
+function openEdit(kind,id){
+  var x=findItem(kind,id); if(!x) return;
+  var b=document.getElementById('sheetBody');
+  if(kind==='people'){
+    b.innerHTML='<h3>\u270f\ufe0f Edit \u00b7 '+x.name+'</h3>'
+      +'<label>Name</label><input id="edName" value="'+x.name+'">'
+      +'<div class="grid2"><div><label>Total amount</label><input type="number" id="edTotal" value="'+(x.total!=null?x.total:x.amount)+'"></div>'
+      +'<div><label>Currency</label><select id="edCur"><option'+(x.currency==='INR'?' selected':'')+'>INR</option><option'+(x.currency==='AED'?' selected':'')+'>AED</option></select></div></div>'
+      +'<label>Already paid</label><input type="number" id="edPaid" value="'+(Number(x.paidAmount)||0)+'">'
+      +'<button class="btn" onclick="saveEdit(\'people\',\''+id+'\')">Save changes</button>'
+      +'<button class="btn red" onclick="delItem(\'people\',\''+id+'\')">Delete this person</button>'
+      +'<button class="btn ghost" onclick="closeSheet()">Cancel</button>';
+  } else {
+    b.innerHTML='<h3>\u270f\ufe0f Edit \u00b7 '+x.name+'</h3>'
+      +'<label>Name</label><input id="edName" value="'+x.name+'">'
+      +'<div class="grid2"><div><label>Monthly amount</label><input type="number" id="edMonthly" value="'+(x.monthly||0)+'"></div>'
+      +'<div><label>Total months</label><input type="number" id="edMonths" value="'+(x.months||0)+'"></div></div>'
+      +'<div class="grid2"><div><label>Total amount</label><input type="number" id="edTotal" value="'+(x.total!=null?x.total:((x.months||0)*(x.monthly||0)))+'"></div>'
+      +'<div><label>Currency</label><select id="edCur"><option'+(x.currency==='INR'?' selected':'')+'>INR</option><option'+(x.currency==='AED'?' selected':'')+'>AED</option></select></div></div>'
+      +'<label>Already paid</label><input type="number" id="edPaid" value="'+(Number(x.paidAmount)||0)+'">'
+      +'<label>Note (optional)</label><input id="edNote" value="'+(x.note||'')+'">'
+      +'<button class="btn" onclick="saveEdit(\'loans\',\''+id+'\')">Save changes</button>'
+      +'<button class="btn red" onclick="delItem(\'loans\',\''+id+'\')">Delete this loan</button>'
+      +'<button class="btn ghost" onclick="closeSheet()">Cancel</button>';
+  }
+  document.getElementById('mask').classList.add('on');
+}
+function saveEdit(kind,id){
+  var x=findItem(kind,id); if(!x) return;
+  var nm=document.getElementById('edName').value.trim(); if(!nm){ alert('Name required'); return; }
+  x.name=nm;
+  if(document.getElementById('edCur')) x.currency=document.getElementById('edCur').value;
+  var t=parseFloat(document.getElementById('edTotal').value);
+  if(!isNaN(t)) x.total=t;
+  var p=parseFloat(document.getElementById('edPaid').value);
+  if(!isNaN(p)) x.paidAmount=p;
+  if(kind==='people'){ x.amount = (!isNaN(t)? t : x.amount); }
+  else {
+    var mo=parseInt(document.getElementById('edMonthly').value); if(!isNaN(mo)) x.monthly=mo;
+    var mn=parseInt(document.getElementById('edMonths').value); if(!isNaN(mn)) x.months=mn;
+    if(document.getElementById('edNote')) x.note=document.getElementById('edNote').value.trim();
+    if(Number(x.monthly)>0 && Number(x.months)>0) x.paid=Math.min(Number(x.months), Math.round((Number(x.paidAmount)||0)/Number(x.monthly)));
+  }
+  var bal = kind==='people'? personBalance(x) : loanBalance(x);
+  x.status = bal<=0.01 ? 'closed' : 'pending';
+  save(); closeSheet(); renderDebt(); renderHome();
+  toast('Changes saved \u2713');
+}
+function delItem(kind,id){
+  var x=findItem(kind,id); if(!x) return;
+  if(!confirm('Delete "'+x.name+'" permanently? This cannot be undone.')) return;
+  if(kind==='people'){ S.people=S.people.filter(function(y){return y.id!==id;}); }
+  else { S.loans=S.loans.filter(function(y){return y.id!==id;}); }
+  save(); closeSheet(); renderDebt(); renderHome();
+  toast('Deleted');
+}
+function closeItem(kind,id){
+  if(!confirm('Mark this as closed/paid off?')) return;
+  S[kind].forEach(function(x){ if(x.id===id) x.status='closed'; });
+  save(); renderDebt(); renderHome();
+  toast('Marked as closed');
+}
+
+/* ================= KURI ================= */
+function renderKuri(){
+  var k=activeKuri();
+  var mon=k.reduce(function(s,x){return s+toINR(x.monthly,x.currency);},0);
+  var paid=k.reduce(function(s,x){return s+toINR((x.paid||0)*x.monthly,x.currency);},0);
+  var val=k.reduce(function(s,x){return s+toINR(x.months*x.monthly,x.currency);},0);
+  document.getElementById('kuMonthly').textContent=inr(mon);
+  document.getElementById('kuPaid').textContent=inr(paid);
+  document.getElementById('kuMature').textContent=inr(val);
+  document.getElementById('kuriList').innerHTML = k.length? k.map(function(x){
+    var pct=Math.round((x.paid/x.months)*100);
+    return '<div class="card" style="padding:14px"><div style="display:flex;align-items:center;gap:10px">'
+      +'<div class="ic" style="width:38px;height:38px;border-radius:11px;background:var(--card2);display:flex;align-items:center;justify-content:center">🎯</div>'
+      +'<div style="flex:1;min-width:0"><div class="nm" style="font-weight:700;font-size:.86em">'+x.name+(x.isNew?' <span class="tag new">new</span>':'')+'</div>'
+      +'<div class="mt" style="font-size:.68em;color:var(--muted)">'+money(x.monthly,x.currency)+'/mo · '+x.paid+'/'+x.months+' months</div></div>'
+      +'<div style="text-align:right"><div class="amt pos" style="font-weight:800">'+inr(toINR(x.months*x.monthly,x.currency))+'</div>'
+      +'<div class="mt" style="font-size:.62em;color:var(--muted)">total value</div></div></div>'
+      +'<div class="bar" style="margin-top:10px"><i style="width:'+pct+'%"></i></div>'
+      +'<div class="mt" style="font-size:.68em;color:var(--muted);margin-top:5px">'+pct+'% paid · '+inr(toINR((x.months-x.paid)*x.monthly,x.currency))+' to go</div>'
+      +'<button class="btn ghost" style="padding:9px;font-size:.76em" onclick="payKuri(\''+x.id+'\')">+ Mark one month paid</button></div>';
+  }).join('') : '<div class="empty">No active kuri.</div>';
+}
+function payKuri(id){
+  S.kuri.forEach(function(x){ if(x.id===id && x.paid<x.months) x.paid++; });
+  save(); renderKuri(); renderHome(); toast('Kuri payment recorded');
+}
+
+/* ================= SETTINGS ================= */
+function fmtM(n){ n=Math.round(n); var y=Math.floor(n/12), m=n%12;
+  if(y<=0) return m+' month'+(m===1?'':'s');
+  return y+' yr'+(y===1?'':'s')+(m?' '+m+' mo':''); }
+function renderTips(){
+  var tips=[];
+  var income = toINR(S.meta.salaryAED||0,'AED');
+  var outM = pendingLoans().reduce(function(s,l){return s+toINR(loanMonthly(l),l.currency);},0);
+  var kuriM = activeKuri().reduce(function(s,k){return s+toINR(k.monthly,k.currency);},0);
+  var spend = monthExpenses().reduce(function(s,e){return s+toINR(e.amount,e.currency);},0);
+  var budget = Number(S.meta.budget)||0;
+  var balLoans = pendingLoans().reduce(function(s,l){return s+loanBalance(l);},0);
+  var balPeople = pendingPeople().reduce(function(s,p){return s+personBalance(p);},0);
+  var committed = outM + kuriM;
+  var surplus = income - committed;
+
+  // 1. overall position
+  tips.push({t:'info',h:'Where you stand',b:'You owe <b>'+inr(balLoans+balPeople)+'</b> in total. '
+    +'Every month <b>'+inr(committed)+'</b> goes to loans + kuri — that is <b>'
+    +(income>0?Math.round(committed/income*100):0)+'%</b> of your '+inr(income)+' salary.'});
+
+  // 2. surplus / deficit
+  if(income>0 && surplus>0){
+    tips.push({t:'good',h:'You have breathing room',b:'After loans and kuri you keep about <b>'+inr(surplus)
+      +'</b>/month. Put at least half of that toward your smallest debt — it clears fastest.'});
+  } else if(income>0){
+    tips.push({t:'danger',h:'You are over-committed',b:'Loans + kuri ('+inr(committed)+') are more than your salary ('
+      +inr(income)+'). Try to restructure or pause the smallest commitment this month.'});
+  }
+
+  // 3. snowball: smallest pending debt
+  var all=[];
+  pendingPeople().forEach(function(p){ all.push({n:p.name, b:personBalance(p), c:p.currency, kind:'person'}); });
+  pendingLoans().forEach(function(l){ if(loanBalance(l)>0) all.push({n:l.name, b:loanBalance(l), c:l.currency, kind:'loan'}); });
+  all.sort(function(a,b){return a.b-b.b;});
+  if(all.length){
+    tips.push({t:'tip',h:'Clear this first',b:'<b>'+all[0].n+'</b> — smallest at <b>'+inr(all[0].b)
+      +'</b>. Finishing one removes a whole line from your list (a real psychological win).'});
+  }
+
+  // 4. biggest monthly burden
+  var byM = pendingLoans().filter(function(l){return loanMonthly(l)>0;})
+    .sort(function(a,b){return toINR(loanMonthly(b),b.currency)-toINR(loanMonthly(a),a.currency);});
+  if(byM.length){
+    var top=byM[0], tv=toINR(loanMonthly(top),top.currency);
+    tips.push({t:'warning',h:'Biggest monthly pull',b:'<b>'+top.name+'</b> takes <b>'+inr(tv)+'/month</b>'
+      +(income>0?(' ('+Math.round(tv/income*100)+'% of salary)'):'')+'. If it can be reduced even temporarily, do that before taking anything new.'});
+  }
+
+  // 5. gold loan due
+  var gold=pendingLoans().filter(function(l){return l.due;});
+  gold.forEach(function(l){
+    var d=new Date(l.due), now=new Date();
+    var months=Math.max(0, Math.round((d-now)/(1000*60*60*24*30)));
+    tips.push({t: months<=6?'danger':'warning', h:'Due date: '+l.name,
+      b:'<b>'+inr(loanBalance(l))+'</b> due '+l.due+' — about <b>'+fmtM(months)+'</b> away. '
+      +(months<=6?'Plan now: renew the loan, or free up money from a finishing loan.':'Set aside a little every month so it never surprises you.')});
+  });
+
+  // 6. low-interest loan — don't prepay
+  var cheap=pendingLoans().filter(function(l){return /UKO/i.test(l.name);})[0];
+  if(cheap){
+    tips.push({t:'tip',h:'Do not rush this one',b:'<b>'+cheap.name+'</b> has very low interest — most of each payment already cuts the principal. '
+      +'Send spare money to the expensive ones first.'});
+  }
+
+  // 7. kuri maturity
+  activeKuri().forEach(function(k){
+    var left=Math.max(0,(k.months||0)-(k.paid||0));
+    if(left>0) tips.push({t:'good',h:'Savings building: '+k.name,
+      b:'<b>'+inr(toINR(k.months*k.monthly,k.currency))+'</b> total, '+left+' months to go. '
+      +'When it matures it can wipe out a big loan in one shot.'});
+  });
+
+  // 8. emergency buffer (medical / leave)
+  tips.push({t:'warning',h:'Keep an emergency buffer',b:'With the operation and possible 2-month leave ahead, '
+    +'keep at least <b>1 month of committed payments ('+inr(committed)+')</b> untouched. Income may pause — debts will not.'});
+
+  // 9. budget status
+  if(budget>0){
+    var pct=Math.round(spend/budget*100);
+    if(pct>=100) tips.push({t:'danger',h:'Over budget',b:'You have spent <b>'+inr(spend)+'</b> of your '+inr(budget)+' budget ('+pct+'%). Hold non-essential spending for the rest of the month.'});
+    else if(pct>=80) tips.push({t:'warning',h:'Close to your limit',b:inr(budget-spend)+' left of your '+inr(budget)+' budget. Slow down for the remaining days.'});
+    else tips.push({t:'good',h:'On budget',b:inr(budget-spend)+' still available this month ('+pct+'% used). Good control.'});
+  } else {
+    tips.push({t:'tip',h:'Set a monthly budget',b:'Go to Settings and set a monthly budget. Dhanam will then track your daily allowance and warn you before you overspend.'});
+  }
+
+  // 10. AED / INR clarity
+  tips.push({t:'info',h:'Two currencies, one view',b:'Your salary is <b>'+money(S.meta.salaryAED,'AED')+'</b> ≈ <b>'+inr(income)
+    +'</b> at '+rate()+'. Dhanam converts everything to INR so debts and salary are comparable.'});
+
+  // 11. avoid expensive short loans
+  tips.push({t:'tip',h:'Avoid short high-interest loans',b:'A past 4-month loan cost you about 17% extra. For any new need, first check: can it wait, can it be split, or is a low-interest loan available?'});
+
+  // 12. halal finance note
+  tips.push({t:'info',h:'Halal money habit',b:'Where you can, prefer interest-free (0%) arrangements and chit/kuri over interest loans. Avoid late fees — they are the easiest money to lose.'});
+
+  var icons={good:'\u2705',tip:'💡',warning:'\u26a0\ufe0f',danger:'🚨',info:'\u2139\ufe0f'};
+  var cls={good:'green',tip:'gold',warning:'gold',danger:'red',info:''};
+  document.getElementById('tipsList').innerHTML = tips.map(function(x){
+    return '<div class="card" style="padding:14px"><div style="display:flex;gap:10px">'
+      +'<div style="font-size:1.2em">'+icons[x.t]+'</div><div style="flex:1;min-width:0">'
+      +'<div style="font-weight:800;font-size:.86em;margin-bottom:3px">'+x.h+'</div>'
+      +'<div style="font-size:.78em;color:var(--muted);line-height:1.55">'+x.b+'</div></div></div></div>';
+  }).join('');
+
+  var rules=['Pay yourself first — save before you spend.',
+    'Clear the smallest debt first; momentum beats maths.',
+    'Never borrow for a want — only for a need.',
+    'If you cannot repay it in 3 months, think twice.',
+    '3 losses in a row = stop. Same for spending.',
+    'Track every rupee for 30 days — awareness alone changes behaviour.',
+    'One loan at a time. Do not stack new debt on old.'];
+  document.getElementById('rulesList').innerHTML = rules.map(function(r,i){
+    return '<div style="display:flex;gap:9px;padding:7px 0;font-size:.8em"><b style="color:var(--green)">'+(i+1)+'.</b><span>'+r+'</span></div>';
+  }).join('');
+
+  var warns=tips.filter(function(x){return x.t==='warning'||x.t==='danger';}).length;
+  document.getElementById('tpCount').textContent = tips.length;
+  document.getElementById('tpWarn').textContent = warns;
+  var months = surplus>0 ? Math.ceil((balLoans+balPeople)/surplus) : 0;
+  document.getElementById('tpDebtFree').textContent = months>0 ? fmtM(months) : '—';
+  document.getElementById('tipsHead').textContent = 'Personalised from your own numbers · updated ' + new Date().toLocaleDateString('en-IN');
+}
+function renderSet(){
+  document.getElementById('sBudget').value = S.meta.budget||'';
+  document.getElementById('sSalary').value = S.meta.salaryAED||'';
+  document.getElementById('sRate').value = S.meta.rate||'';
+  document.getElementById('aboutDate').textContent = new Date().toLocaleDateString('en-IN');
+}
+function saveSettings(){
+  S.meta.budget = parseFloat(document.getElementById('sBudget').value)||0;
+  S.meta.salaryAED = parseFloat(document.getElementById('sSalary').value)||0;
+  S.meta.rate = parseFloat(document.getElementById('sRate').value)||24.69;
+  save(); renderHome(); toast('Settings saved');
+}
+function exportData(){
+  var blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='dhanam-backup-'+today()+'.json'; a.click();
+}
+function importData(){
+  var inp=document.createElement('input'); inp.type='file'; inp.accept='.json';
+  inp.onchange=function(){
+    var f=inp.files[0]; if(!f) return;
+    var r=new FileReader();
+    r.onload=function(){ try{ var d=JSON.parse(r.result); if(d.meta){ S=d; save(); renderAll(); toast('Backup restored'); } }catch(e){ alert('Invalid file'); } };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+function resetData(){
+  if(!confirm('Erase all Dhanam data on this device and start fresh?')) return;
+  S=JSON.parse(JSON.stringify(SEED)); save(); renderAll(); toast('Reset done');
+}
+
+/* ================= SHEETS ================= */
+function openSheet(which){
+  var b=document.getElementById('sheetBody');
+  if(which==='settings'){ go('set', document.querySelectorAll('.tabbar button')[5]); closeSheet(); return; }
+  if(which==='expense'){ go('exp', document.querySelectorAll('.tabbar button')[1]); closeSheet(); return; }
+  if(which==='debt'){
+    b.innerHTML='<h3>Add debt / loan</h3>'
+      +'<label>Name</label><input id="dName" placeholder="e.g. Gold Loan">'
+      +'<label>Type</label><select id="dType"><option value="monthly">Monthly payment</option><option value="lump">Lump sum (one time)</option></select>'
+      +'<div class="grid2"><div><label>Monthly amount</label><input type="number" id="dMonthly" placeholder="0"></div>'
+      +'<div><label>Months</label><input type="number" id="dMonths" placeholder="12"></div></div>'
+      +'<div class="grid2"><div><label>Currency</label><select id="dCur"><option>INR</option><option>AED</option></select></div>'
+      +'<div><label>Note</label><input id="dNote" placeholder="optional"></div></div>'
+      +'<button class="btn" onclick="saveDebt()">Save</button><button class="btn ghost" onclick="closeSheet()">Cancel</button>';
+    document.getElementById('mask').classList.add('on'); return;
+  }
+  if(which==='kuri'){
+    b.innerHTML='<h3>Add kuri / savings</h3>'
+      +'<label>Name</label><input id="kName" placeholder="e.g. New Kuri">'
+      +'<div class="grid2"><div><label>Monthly amount</label><input type="number" id="kMonthly" placeholder="0"></div>'
+      +'<div><label>Total months</label><input type="number" id="kMonths" placeholder="10"></div></div>'
+      +'<button class="btn" onclick="saveKuri()">Save</button><button class="btn ghost" onclick="closeSheet()">Cancel</button>';
+    document.getElementById('mask').classList.add('on'); return;
+  }
+}
+function closeSheet(){ document.getElementById('mask').classList.remove('on'); }
+function saveDebt(){
+  var n=document.getElementById('dName').value.trim(); if(!n){ alert('Enter a name'); return; }
+  var t=document.getElementById('dType').value;
+  var o={id:'l'+Date.now(), name:n, currency:document.getElementById('dCur').value,
+    note:document.getElementById('dNote').value.trim(), status:'pending', isNew:true};
+  if(t==='lump'){ o.lump=parseFloat(document.getElementById('dMonthly').value)||0; }
+  else { o.monthly=parseFloat(document.getElementById('dMonthly').value)||0; o.months=parseInt(document.getElementById('dMonths').value)||0; o.paid=0; }
+  S.loans.push(o); save(); closeSheet(); renderDebt(); renderHome(); toast('Debt added');
+}
+function saveKuri(){
+  var n=document.getElementById('kName').value.trim(); if(!n){ alert('Enter a name'); return; }
+  S.kuri.push({id:'k'+Date.now(), name:n, monthly:parseFloat(document.getElementById('kMonthly').value)||0,
+    months:parseInt(document.getElementById('kMonths').value)||0, paid:0, currency:'INR', status:'active', isNew:true});
+  save(); closeSheet(); renderKuri(); renderHome(); toast('Kuri added');
+}
+
+/* ================= MISC ================= */
+function toast(msg){
+  var t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--green);color:#fff;'
+    +'padding:11px 18px;border-radius:12px;font-size:.82em;font-weight:700;z-index:500;box-shadow:0 6px 20px rgba(0,0,0,.2)';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 1600);
+}
+function renderAll(){ renderModes(); renderHome(); renderExp(); renderInc(); renderDebt(); renderKuri(); renderTips(); renderSet(); }
+
+/* ================= INIT ================= */
+document.addEventListener('DOMContentLoaded', function(){
+  document.body.classList.toggle('dark', !!S.meta.dark);
+  document.getElementById('dm').textContent = S.meta.dark?'☀️':'🌙';
+  var d=document.getElementById('eDate'); if(d) d.value=today();
+  var d2=document.getElementById('iDate'); if(d2) d2.value=today();
+  var e=document.getElementById('eWho'); if(e) e.value = S.meta.mode==='couple'?'Couple':'Me';
+  renderAll();
+});
+window.addEventListener('resize', function(){ drawCat(); });
+</script>
+
+<script>
+if ('serviceWorker' in navigator && navigator.serviceWorker) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
