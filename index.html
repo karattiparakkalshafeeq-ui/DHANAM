@@ -233,6 +233,15 @@ canvas{width:100%;display:block}
       </div>
       <div class="sub" style="margin-top:10px" id="incSalary"></div>
     </div>
+    <div class="card" style="border-color:rgba(255,152,0,.35)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="ctitle" style="margin:0">📈 Trading · from VipaNanam</div>
+        <div class="spacer" style="flex:1"></div>
+        <button class="chip" onclick="loadVipananam(true)" style="cursor:pointer">↻ Refresh</button>
+      </div>
+      <div id="vpBody" style="margin-top:10px"></div>
+    </div>
+
     <div class="sec">Income history</div>
     <div id="incList"></div>
   </div>
@@ -397,7 +406,7 @@ function go(id, btn){
   window.scrollTo(0,0);
   if(id==='home') renderHome();
   if(id==='exp') renderExp();
-  if(id==='inc') renderInc();
+  if(id==='inc'){ renderInc(); if(VP_TRADES===null) loadVipananam(false); }
   if(id==='debt') renderDebt();
   if(id==='kuri') renderKuri();
   if(id==='tips') renderTips();
@@ -566,6 +575,52 @@ function addIncome(){
   document.getElementById('iAmt').value=''; document.getElementById('iSrc').value='';
   renderInc(); renderHome();
   toast('Income saved');
+}
+var VP_TRADES = null;
+function loadVipananam(manual){
+  // VipaNanam and Dhanam share the same origin, so we can read its journal directly.
+  try{
+    var raw = localStorage.getItem('vipananam_trades_v3');
+    VP_TRADES = raw ? JSON.parse(raw) : null;
+    if(!VP_TRADES || !VP_TRADES.length) VP_TRADES = null;
+  }catch(e){ VP_TRADES = null; }
+  renderVipananam();
+  if(manual) toast(VP_TRADES ? ('Found '+VP_TRADES.length+' trades from VipaNanam') : 'No VipaNanam data on this device');
+}
+function renderVipananam(){
+  var el=document.getElementById('vpBody'); if(!el) return;
+  if(!VP_TRADES){
+    el.innerHTML='<div style="font-size:.78em;color:var(--muted);line-height:1.6">'
+      +'No VipaNanam journal found on this device.<br>'
+      +'Open the <b>VipaNanam</b> app once (so it saves its journal), then tap <b>\u21bb Refresh</b> here.</div>';
+    return;
+  }
+  var t=VP_TRADES, n=t.length;
+  var pnl=t.reduce(function(s,x){ return s+(Number(x.pnl)||0); },0);
+  var wins=t.filter(function(x){ return (Number(x.pnl)||0)>0; }).length;
+  var losses=t.filter(function(x){ return (Number(x.pnl)||0)<0; }).length;
+  var wr=n? Math.round(wins/n*100) : 0;
+  var best=t.slice().sort(function(a,b){return (Number(b.pnl)||0)-(Number(a.pnl)||0);})[0];
+  var worst=t.slice().sort(function(a,b){return (Number(a.pnl)||0)-(Number(b.pnl)||0);})[0];
+  el.innerHTML =
+    '<div class="grid3">'
+    +'<div class="stat"><b class="'+(pnl>=0?'pos':'neg')+'">'+inr(pnl)+'</b><span>Total P&L</span></div>'
+    +'<div class="stat"><b>'+wr+'%</b><span>Win rate</span></div>'
+    +'<div class="stat"><b>'+n+'</b><span>Trades</span></div>'
+    +'</div>'
+    +'<div class="sub" style="margin-top:8px">'+wins+' wins \u00b7 '+losses+' losses'
+    +(best?' \u00b7 best '+best.symbol+' '+inr(best.pnl):'')
+    +(worst?' \u00b7 worst '+worst.symbol+' '+inr(worst.pnl):'')+'</div>'
+    +'<div class="sec" style="margin:14px 0 6px">Journal</div>'
+    +t.slice().reverse().map(function(x){
+        var p=Number(x.pnl)||0;
+        return '<div class="row"><div class="ic">\U0001F4C8</div><div class="mid">'
+          +'<div class="nm">'+x.symbol+'</div>'
+          +'<div class="mt">'+(x.date||'')+(x.exitDate?' \u2192 '+x.exitDate:'')+' \u00b7 qty '+(x.qty||'')+(x.emotion?' \u00b7 '+x.emotion:'')+'</div>'
+          +'</div><div class="amt '+(p>=0?'pos':'neg')+'">'+inr(p)+'</div></div>';
+      }).join('')
+    +'<div class="sub" style="margin-top:8px;font-size:.68em">Read live from the VipaNanam app on this device. '
+    +'It stays in sync \u2014 no copy, no duplication.</div>';
 }
 function renderInc(){
   var inc=monthIncome().reduce(function(s,e){ return s+toINR(e.amount,e.currency); },0);
@@ -981,7 +1036,7 @@ function toast(msg){
   document.body.appendChild(t);
   setTimeout(function(){ t.remove(); }, 1600);
 }
-function renderAll(){ renderModes(); renderHome(); renderExp(); renderInc(); renderDebt(); renderKuri(); renderTips(); renderSet(); }
+function renderAll(){ renderModes(); renderHome(); renderExp(); renderInc(); renderVipananam(); renderDebt(); renderKuri(); renderTips(); renderSet(); }
 
 /* ================= INIT ================= */
 document.addEventListener('DOMContentLoaded', function(){
@@ -991,6 +1046,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var d2=document.getElementById('iDate'); if(d2) d2.value=today();
   var e=document.getElementById('eWho'); if(e) e.value = S.meta.mode==='couple'?'Couple':'Me';
   renderAll();
+  loadVipananam(false);
 });
 window.addEventListener('resize', function(){ drawCat(); });
 </script>
