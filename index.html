@@ -181,6 +181,15 @@ canvas{width:100%;display:block}
       <div class="sub" style="margin-top:10px" id="hKuri"></div>
     </div>
 
+    <div class="card" id="dueCard" style="display:none;border-color:rgba(224,164,22,.45)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="ctitle" style="margin:0">⏰ Due soon</div>
+        <div style="flex:1"></div>
+        <div class="chip gold" id="dueChip">—</div>
+      </div>
+      <div id="dueList" style="margin-top:10px"></div>
+    </div>
+
     <div class="card">
       <div class="ctitle">Where it went</div>
       <canvas id="catChart" height="150"></canvas>
@@ -318,6 +327,24 @@ canvas{width:100%;display:block}
       <button class="btn" onclick="saveSettings()">Save settings</button>
     </div>
     <div class="card">
+      <div class="ctitle">⏰ Payment reminders</div>
+      <label style="display:flex;align-items:center;gap:10px;font-size:.82em;color:var(--text)">
+        <input type="checkbox" id="sRemind" style="width:auto;margin:0" onchange="saveReminders()">
+        Remind me before payments
+      </label>
+      <label>Days before (default 5)</label><input type="number" id="sRemindDays" min="0" max="30" placeholder="5" inputmode="numeric" onchange="saveReminders()">
+      <div class="sub" id="notifState" style="margin-top:8px"></div>
+      <button class="btn ghost" onclick="enableNotifications()">🔔 Enable phone notifications</button>
+      <button class="btn ghost" onclick="exportICS()">📅 Add all payments to phone calendar (.ics)</button>
+      <div class="sub" style="margin-top:10px;line-height:1.6">
+        <b>How it works:</b> Dhanam checks your due dates every time you open it and shows a
+        “Due soon” card. Phone notifications fire while the app is open (a website cannot
+        push in the background without a server). For reminders that work even when the app is
+        closed, use the <b>.ics</b> button — your phone calendar will alert you reliably.
+      </div>
+    </div>
+
+    <div class="card">
       <div class="ctitle">Data</div>
       <button class="btn ghost" onclick="exportData()">⬇ Export backup (JSON)</button>
       <button class="btn ghost" onclick="importData()">⬆ Import backup</button>
@@ -349,7 +376,7 @@ canvas{width:100%;display:block}
 /* ================= STATE ================= */
 var KEY='dhanam_v1';
 var SEED={
-  meta:{rate:24.69,salaryAED:1400,budget:0,mode:'me',dark:false},
+  meta:{rate:24.69,salaryAED:1400,budget:0,mode:'me',dark:false,remind:true,remindDays:5},
   income:[], expenses:[],
   people:[
     {id:'p1',name:'KUTTIMON',amount:3500,total:3500,paidAmount:0,currency:'INR',status:'pending'},
@@ -362,21 +389,21 @@ var SEED={
   ],
   repayments:[],
   loans:[
-    {id:'l1',name:"Lingage by Shalu's Home",monthly:12000,months:27,paid:7,total:324000,paidAmount:84000,currency:'INR',status:'pending',note:'0% chit · 20 months left'},
+    {id:'l1',name:"Lingage by Shalu's Home",dueDay:18,monthly:12000,months:27,paid:7,total:324000,paidAmount:84000,currency:'INR',status:'pending',note:'0% chit · 20 months left'},
     {id:'l2',name:'Gold Loan',lump:210000,total:210000,paidAmount:0,due:'2027-01-01',currency:'INR',status:'pending',note:'CHAIN · renew or clear by Jan 2027'},
-    {id:'l3',name:'UKO Bank Loan',monthly:5200,months:48,paid:8,total:249600,paidAmount:41600,currency:'INR',status:'pending',note:'low interest · 40 months left'},
-    {id:'l4',name:'Adav Dubai (new plan)',monthly:300,months:3,paid:0,total:900,paidAmount:0,currency:'AED',status:'pending',note:'starts next month',isNew:true},
-    {id:'l5',name:'Ticket loan',monthly:3267,months:6,paid:0,total:19602,paidAmount:0,currency:'INR',status:'pending',note:'for ticket · starts next month',isNew:true},
-    {id:'l6',name:'LT FINANCE',monthly:8880,months:48,paid:0,total:426240,paidAmount:0,principal:300000,serviceCharge:10000,start:'2026-11-03',currency:'INR',status:'pending',note:'new loan · 48 months · from 03 Nov 2026 · service charge 10,000',isNew:true},
+    {id:'l3',name:'UKO Bank Loan',dueDay:30,monthly:5200,months:48,paid:8,total:249600,paidAmount:41600,currency:'INR',status:'pending',note:'low interest · 40 months left'},
+    {id:'l4',name:'Adav Dubai (new plan)',dueDay:16,monthly:300,months:3,paid:0,total:900,paidAmount:0,currency:'AED',status:'pending',note:'starts next month',isNew:true},
+    {id:'l5',name:'Ticket loan',dueDay:1,monthly:3267,months:6,paid:0,total:19602,paidAmount:0,currency:'INR',status:'pending',note:'for ticket · starts next month',isNew:true},
+    {id:'l6',name:'LT FINANCE',dueDay:3,monthly:8880,months:48,paid:0,total:426240,paidAmount:0,principal:300000,serviceCharge:10000,start:'2026-11-03',currency:'INR',status:'pending',note:'new loan · 48 months · from 03 Nov 2026 · service charge 10,000',isNew:true},
     {id:'l7',name:'Lingage by Home',monthly:4000,months:13,paid:13,total:52000,paidAmount:52000,currency:'INR',status:'closed'},
     {id:'l8',name:'Kudubashree Loan',lump:15000,total:15000,paidAmount:15000,currency:'INR',status:'closed'},
     {id:'l9',name:'Bajaj Loan',monthly:4098,months:8,paid:8,total:32784,paidAmount:32784,currency:'INR',status:'closed'},
     {id:'l10',name:'Adav Dubai (old)',monthly:355,months:4,paid:4,total:1420,paidAmount:1420,currency:'AED',status:'closed'}
   ],
   kuri:[
-    {id:'k1',name:'Faizal Kuri',monthly:3750,months:40,paid:9,currency:'INR',status:'active'},
-    {id:'k2',name:'Kunithatha Kuri (Chittiyan)',monthly:2000,months:15,paid:6,currency:'INR',status:'active'},
-    {id:'k3',name:'New Kuri',monthly:5000,months:10,paid:0,currency:'INR',status:'active',isNew:true}
+    {id:'k1',name:'Faizal Kuri',dueDay:5,monthly:3750,months:40,paid:9,currency:'INR',status:'active'},
+    {id:'k2',name:'Kunithatha Kuri (Chittiyan)',dueDay:10,monthly:2000,months:15,paid:6,currency:'INR',status:'active'},
+    {id:'k3',name:'New Kuri',dueDay:5,monthly:5000,months:10,paid:0,currency:'INR',status:'active',isNew:true}
   ]
 };
 var S = load();
@@ -455,6 +482,129 @@ function loanPaid(l){ return toINR(Number(l.paidAmount)||0, l.currency); }
 function loanBalance(l){ return Math.max(0, loanTotal(l)-loanPaid(l)); }
 
 /* ================= HOME ================= */
+/* ---------- reminders ---------- */
+function nextDue(dueDay){
+  var now=new Date(); var day=Math.min(28, Math.max(1, Number(dueDay)||1));
+  var d=new Date(now.getFullYear(), now.getMonth(), day);
+  var t=new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if(d < t) d=new Date(now.getFullYear(), now.getMonth()+1, day);
+  return d;
+}
+function daysUntil(d){
+  var t=new Date(); t.setHours(0,0,0,0);
+  var x=new Date(d); x.setHours(0,0,0,0);
+  return Math.round((x-t)/86400000);
+}
+function dueItems(){
+  var out=[];
+  pendingLoans().forEach(function(l){
+    if(l.lump){
+      if(l.due) out.push({name:l.name, amount:loanBalance(l), cur:l.currency, date:new Date(l.due), kind:'loan'});
+    } else if(Number(l.monthly)>0){
+      out.push({name:l.name, amount:Number(l.monthly), cur:l.currency,
+        date:nextDue(l.dueDay||1), kind:'loan', dueDay:l.dueDay||1});
+    }
+  });
+  activeKuri().forEach(function(k){
+    if(Number(k.monthly)>0) out.push({name:k.name, amount:Number(k.monthly), cur:k.currency,
+      date:nextDue(k.dueDay||1), kind:'kuri', dueDay:k.dueDay||1});
+  });
+  out.forEach(function(x){ x.days=daysUntil(x.date); });
+  out.sort(function(a,b){ return a.days-b.days; });
+  return out;
+}
+function renderDue(){
+  var card=document.getElementById('dueCard'); if(!card) return;
+  var days = Number(S.meta.remindDays)||5;
+  var all = dueItems();
+  var soon = all.filter(function(x){ return x.days>=0 && x.days<=days; });
+  if(!S.meta.remind || !soon.length){ card.style.display='none'; return; }
+  card.style.display='block';
+  var total = soon.reduce(function(s,x){ return s+toINR(x.amount,x.cur); },0);
+  document.getElementById('dueChip').textContent = soon.length+' due \u00b7 '+inr(total);
+  document.getElementById('dueList').innerHTML = soon.map(function(x){
+    var when = x.days===0 ? 'TODAY' : (x.days===1 ? 'tomorrow' : 'in '+x.days+' days');
+    var urgent = x.days<=1;
+    return '<div class="row"><div class="ic">'+(x.kind==='kuri'?'\ud83c\udfaf':'\ud83c\udfe6')+'</div>'
+      +'<div class="mid"><div class="nm">'+x.name+'</div>'
+      +'<div class="mt">'+x.date.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' \u00b7 '+when+'</div></div>'
+      +'<div class="amt '+(urgent?'neg':'')+'">'+money(x.amount,x.cur)+'</div></div>';
+  }).join('')
+  +'<div class="sub" style="margin-top:8px;font-size:.68em">Reminder: '+days+' day'+(days===1?'':'s')+' before \u00b7 change it in Settings</div>';
+}
+function saveReminders(){
+  var c=document.getElementById('sRemind'), d=document.getElementById('sRemindDays');
+  if(c) S.meta.remind = !!c.checked;
+  if(d){ var v=parseInt(d.value); S.meta.remindDays = isNaN(v)?5:Math.min(30,Math.max(0,v)); }
+  save(); renderDue(); renderSet(); toast('Reminder settings saved');
+}
+function notifState(){
+  var el=document.getElementById('notifState'); if(!el) return;
+  if(!('Notification' in window)){ el.textContent='This browser does not support notifications.'; return; }
+  var p=Notification.permission;
+  el.innerHTML = p==='granted' ? '\u2705 Phone notifications are ON.'
+    : p==='denied' ? '\u26a0\ufe0f Notifications blocked. Allow them in your browser site settings.'
+    : 'Notifications not enabled yet \u2014 tap the button below.';
+}
+function enableNotifications(){
+  if(!('Notification' in window)){ alert('This browser does not support notifications.'); return; }
+  Notification.requestPermission().then(function(p){
+    notifState();
+    if(p==='granted'){ toast('Notifications enabled'); checkReminders(true); }
+    else toast('Permission not granted');
+  }).catch(function(){ alert('Could not request permission.'); });
+}
+function checkReminders(force){
+  if(!S.meta.remind) return;
+  var days=Number(S.meta.remindDays)||5;
+  var soon=dueItems().filter(function(x){ return x.days>=0 && x.days<=days; });
+  if(!soon.length) return;
+  try{
+    if('Notification' in window && Notification.permission==='granted'){
+      var body=soon.map(function(x){
+        return x.name+' \u2014 '+money(x.amount,x.cur)+(x.days===0?' (today)':' (in '+x.days+'d)');
+      }).join('\n');
+      new Notification('Dhanam \u00b7 '+soon.length+' payment'+(soon.length>1?'s':'')+' due soon', {body:body, tag:'dhanam-due'});
+    }
+  }catch(e){}
+  if(force) toast(soon.length+' payment'+(soon.length>1?'s':'')+' due within '+days+' days');
+}
+function exportICS(){
+  var items=dueItems();
+  if(!items.length){ alert('No upcoming payments found.'); return; }
+  function pad(n){ return (n<10?'0':'')+n; }
+  function dstr(d){ return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate()); }
+  var L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Dhanam//Payment reminders//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+  items.forEach(function(x,i){
+    var count = x.dueDay ? 12 : 1;
+    for(var k=0;k<count;k++){
+      var d = x.dueDay ? new Date(x.date.getFullYear(), x.date.getMonth()+k, Math.min(28,x.dueDay)) : x.date;
+      if(d < new Date()) continue;
+      var end=new Date(d.getTime()+86400000);
+      L.push('BEGIN:VEVENT');
+      L.push('UID:dhanam-'+i+'-'+k+'@dhanam');
+      L.push('DTSTAMP:'+dstr(new Date())+'T000000Z');
+      L.push('DTSTART;VALUE=DATE:'+dstr(d));
+      L.push('DTEND;VALUE=DATE:'+dstr(end));
+      L.push('SUMMARY:Dhanam \u2014 pay '+x.name);
+      L.push('DESCRIPTION:'+money(x.amount,x.cur)+' due ('+(x.kind==='kuri'?'kuri':'loan')+')');
+      L.push('BEGIN:VALARM');
+      L.push('TRIGGER:-P'+(Number(S.meta.remindDays)||5)+'D');
+      L.push('ACTION:DISPLAY');
+      L.push('DESCRIPTION:Pay '+x.name+' in '+(Number(S.meta.remindDays)||5)+' days');
+      L.push('END:VALARM');
+      L.push('END:VEVENT');
+    }
+  });
+  L.push('END:VCALENDAR');
+  var blob=new Blob([L.join('\r\n')],{type:'text/calendar;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='dhanam-payments.ics';
+  a.click();
+  toast('Calendar file downloaded \u2713');
+}
+
 function renderHome(){
   var now=new Date();
   var hr=now.getHours();
@@ -505,6 +655,7 @@ function renderHome(){
   document.getElementById('hKuri').textContent = 'Kuri going out: ' + inr(km) + '/month';
 
   drawCat();
+  renderDue();
 }
 
 function drawCat(){
@@ -757,7 +908,8 @@ function openEdit(kind,id){
       +'<div><label>Total months</label><input type="number" id="edMonths" value="'+(x.months||0)+'"></div></div>'
       +'<div class="grid2"><div><label>Total amount</label><input type="number" id="edTotal" value="'+(x.total!=null?x.total:((x.months||0)*(x.monthly||0)))+'"></div>'
       +'<div><label>Currency</label><select id="edCur"><option'+(x.currency==='INR'?' selected':'')+'>INR</option><option'+(x.currency==='AED'?' selected':'')+'>AED</option></select></div></div>'
-      +'<label>Already paid</label><input type="number" id="edPaid" value="'+(Number(x.paidAmount)||0)+'">'
+      +'<div class="grid2"><div><label>Due day (1-28)</label><input type="number" id="edDueDay" min="1" max="28" value="'+(x.dueDay||1)+'"></div>'
+      +'<div><label>Already paid</label><input type="number" id="edPaid" value="'+(Number(x.paidAmount)||0)+'"></div></div>'
       +'<label>Note (optional)</label><input id="edNote" value="'+(x.note||'')+'">'
       +'<button class="btn" onclick="saveEdit(\'loans\',\''+id+'\')">Save changes</button>'
       +'<button class="btn red" onclick="delItem(\'loans\',\''+id+'\')">Delete this loan</button>'
@@ -778,6 +930,7 @@ function saveEdit(kind,id){
   else {
     var mo=parseInt(document.getElementById('edMonthly').value); if(!isNaN(mo)) x.monthly=mo;
     var mn=parseInt(document.getElementById('edMonths').value); if(!isNaN(mn)) x.months=mn;
+    var dd=document.getElementById('edDueDay'); if(dd){ var dv=parseInt(dd.value); if(!isNaN(dv)) x.dueDay=Math.min(28,Math.max(1,dv)); }
     if(document.getElementById('edNote')) x.note=document.getElementById('edNote').value.trim();
     if(Number(x.monthly)>0 && Number(x.months)>0) x.paid=Math.min(Number(x.months), Math.round((Number(x.paidAmount)||0)/Number(x.monthly)));
   }
@@ -954,6 +1107,9 @@ function renderTips(){
   document.getElementById('tipsHead').textContent = 'Personalised from your own numbers · updated ' + new Date().toLocaleDateString('en-IN');
 }
 function renderSet(){
+  var rc=document.getElementById('sRemind'); if(rc) rc.checked = !!S.meta.remind;
+  var rd=document.getElementById('sRemindDays'); if(rd) rd.value = (S.meta.remindDays!=null?S.meta.remindDays:5);
+  notifState();
   document.getElementById('sBudget').value = S.meta.budget||'';
   document.getElementById('sSalary').value = S.meta.salaryAED||'';
   document.getElementById('sRate').value = S.meta.rate||'';
@@ -1047,6 +1203,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var e=document.getElementById('eWho'); if(e) e.value = S.meta.mode==='couple'?'Couple':'Me';
   renderAll();
   loadVipananam(false);
+  checkReminders(false);
 });
 window.addEventListener('resize', function(){ drawCat(); });
 </script>

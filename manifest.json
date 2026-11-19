@@ -1,7 +1,7 @@
 {
   "name": "Dhanam \u00b7 \u0d27\u0d28\u0d02",
   "short_name": "Dhanam",
-  "description": "Personal & couple money manager \u2014 debts, kuri, expenses, tips. A companion to VipaNanam.",
+  "description": "Personal & couple money manager \u2014 debts, kuri, expenses, reminders, tips.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#eef4f1",
